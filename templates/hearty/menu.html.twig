@@ -1,6 +1,25 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+<style>
+@keyframes slideInFadeOut {
+  0% { opacity: 0; transform: translateY(-20px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); }
+}
+
+.animate-slide-in {
+  animation: slideInFadeOut 3s ease-in-out forwards;
+}
+</style>
+{% for message in app.flashes('success') %}
+  <div id="flash-popup"
+       class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-black px-6 py-3 rounded-xl shadow-lg z-50 animate-slide-in">
+    {{ message }}
+  </div>
+{% endfor %}
+
 <img class="logo mx-auto mb-8" src="https://image.noelshack.com/fichiers/2025/28/4/1752137195-logohearty.png" alt="Logo Hearty&Hairy" />
 
 {% set grouped = {'entrée': [], 'plat': [], 'dessert': [], 'boisson': []} %}

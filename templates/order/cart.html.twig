@@ -1,51 +1,61 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Panier
-{% endblock %}
+{% block title %}Panier{% endblock %}
 
 {% block body %}
-	<div class="flex justify-center items-center min-h-screen">
-		<div class="w-full max-w-2xl bg-white shadow-lg rounded-lg p-6">
-			<h1 class="text-3xl font-bold text-gray-800 text-center mb-6">🛒 Votre panier</h1>
+<div class="flex justify-center items-center min-h-screen">
+  <div class="w-full max-w-2xl bg-white shadow-lg rounded-lg p-6">
+    <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">Votre panier</h1>
 
-			{% if items|length == 0 %}
-				<p class="text-center text-gray-600">Votre panier est vide.</p>
-			{% else %}
-				<ul class="divide-y divide-gray-200 mb-6">
-					{% for item in items %}
-						<li class="py-4 flex justify-between items-center">
-							<div>
-								<p class="text-sm text-gray-700">{{ item.quantity }}
-									×
-									<strong>{{ item.dish.name }}</strong>
-								</p>
-							</div>
-							<div class="text-gray-900 font-semibold">{{ item.dish.price }}
-								€</div>
-						</li>
-					{% endfor %}
-				</ul>
+    {% for message in app.flashes('success') %}
+      <div class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded mb-4 text-center font-semibold">
+        {{ message }}
+      </div>
+    {% endfor %}
 
-				<div class="text-right text-lg font-bold text-gray-800 mb-4">
-					Total :
-					{{ total }}
-					€
-				</div>
+    {% if items|length == 0 %}
+      <p class="text-center text-gray-600">Votre panier est vide.</p>
+    {% else %}
+      <ul class="divide-y divide-gray-200 mb-6">
+        {% for item in items %}
+          <li class="py-4 flex justify-between items-center">
+            <div>
+              <p class="text-sm text-gray-700">
+                {{ item.quantity }} × <strong>{{ item.dish.name }}</strong>
+              </p>
+            </div>
 
-				<div class="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0">
-					<form method="post" action="{{ path('afficher_paiement') }}">
-						<button type="submit" class="bg-green-500 text-white font-bold px-6 py-2 rounded hover:bg-green-400 transition">
-							Valider la commande ✅
-						</button>
-					</form>
+            <div class="flex items-center gap-4">
+              <span class="text-gray-900 font-semibold">{{ item.dish.price }} €</span>
 
-					<form method="get" action="{{ path('vider_panier') }}" class="w-full">
-						<button type="submit" class="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition duration-200">
-							🧹 Vider le panier
-						</button>
-					</form>
-				</div>
-			{% endif %}
-		</div>
-	</div>
+              <form method="get" action="{{ path('supprimer_article', { id: item.dish.id }) }}">
+                <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-bold">
+                  🗑️ Retirer
+                </button>
+              </form>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <div class="text-right text-lg font-bold text-gray-800 mb-4">
+        Total : {{ total }} €
+      </div>
+
+      <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0">
+        <form method="post" action="{{ path('afficher_paiement') }}">
+          <button type="submit" class="bg-green-500 text-white font-bold px-6 py-2 rounded hover:bg-green-400 transition">
+            Valider la commande ✅
+          </button>
+        </form>
+
+        <form method="get" action="{{ path('vider_panier') }}" class="w-full">
+          <button type="submit" class="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition duration-200">
+             Vider le panier
+          </button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}
