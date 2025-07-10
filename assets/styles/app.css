@@ -1,3 +1,19 @@
+@import "tailwindcss";
+
 body {
-    background-color: skyblue;
+    background: url('/image/Hearty Hairy.png') center center/cover;
+}
+
+.logo {
+    width: 600px;
+    height: 600px;
+    text-align: center;
+    margin: auto;
+}
+
+.logo2 {
+    width: 300px;
+    height: 300px;
+    text-align: center;
+    margin: auto;
 }

@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin - Hearty&Hairy{% endblock %}
+
+{% block body %}
+<h1>🛠️ Panneau Admin</h1>
+
+<h2>Catégories</h2>
+<ul>
+    {% for category in categories %}
+        <li>{{ category.name }}</li>
+    {% endfor %}
+</ul>
+
+<h2>Plats</h2>
+<ul>
+    {% for dish in dishes %}
+        <li>{{ dish.name }} - {{ dish.category.name }} - {{ dish.price }}€</li>
+    {% endfor %}
+</ul>
+{% endblock %}

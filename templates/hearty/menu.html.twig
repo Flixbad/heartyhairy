@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<img class="logo mx-auto mb-8" src="https://image.noelshack.com/fichiers/2025/28/4/1752137195-logohearty.png" alt="Logo Hearty&Hairy" />
+
+{% set grouped = {'entrée': [], 'plat': [], 'dessert': [], 'boisson': []} %}
+{% for dish in dishes %}
+  {% set cat = dish.category.name|lower %}
+  {% if grouped[cat] is defined %}
+    {% set grouped = grouped|merge({ (cat): grouped[cat]|merge([dish]) }) %}
+  {% endif %}
+{% endfor %}
+
+{% for cat, list in grouped %}
+  <section class="mb-12">
+    <h2 class="text-3xl font-bold uppercase tracking-wider text-white bg-yellow-500 bg-opacity-80 px-4 py-2 inline-block rounded shadow">{{ cat|capitalize }}</h2>
+
+    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+      {% for dish in list %}
+        <form method="post" action="{{ path('panier_ajout') }}"
+              class="bg-white/90 text-gray-800 rounded-xl shadow-lg p-6 border-l-8 border-yellow-400 
+                     transform transition duration-300 hover:-translate-y-1 hover:shadow-2xl hover:border-yellow-500">
+          
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-xl font-bold text-gray-900">{{ dish.name }}</h3>
+            <span class="text-lg font-extrabold text-yellow-600">{{ (dish.price)|format_currency('EUR', { fraction_digit: 2 }) }}</span>
+          </div>
+
+          <p class="text-sm italic text-gray-600 mb-4">{{ dish.description | raw }}</p>
+
+          <div class="flex justify-between items-center mt-4">
+            <input type="number" name="quantities[{{ dish.id }}]" min="1" value="1"
+                   class="w-16 text-center rounded border border-gray-300 px-2 py-1 focus:ring focus:ring-yellow-400">
+            
+            <button type="submit"
+                    class="bg-yellow-400 text-black font-bold px-4 py-2 rounded shadow hover:bg-yellow-300 transition">
+              Ajouter 🛒
+            </button>
+          </div>
+        </form>
+      {% endfor %}
+    </div>
+  </section>
+{% endfor %}
+{% endblock %}

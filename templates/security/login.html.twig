@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex items-center justify-center">
+  <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">🔐 Connexion</h2>
+
+    {% if error %}
+      <div class="bg-red-100 text-red-800 px-4 py-2 rounded mb-4">
+        {{ error.messageKey|trans(error.messageData, 'security') }}
+      </div>
+    {% endif %}
+
+    {% if app.user %}
+      <div class="bg-green-100 text-green-800 px-4 py-2 rounded mb-4">
+        Connecté en tant que {{ app.user.userIdentifier }}.
+        <a href="{{ path('app_logout') }}" class="text-blue-600 hover:underline ml-2">Se déconnecter</a>
+      </div>
+    {% endif %}
+
+    <form method="post" class="space-y-4">
+      <div>
+        <label for="username" class="block text-sm font-medium text-gray-700">Adresse email</label>
+        <input type="email" value="{{ last_username }}" name="_username" id="username"
+               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+               autocomplete="email" required autofocus>
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
+        <input type="password" name="_password" id="password"
+               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+               autocomplete="current-password" required>
+      </div>
+
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+      <button type="submit"
+              class="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700 transition duration-200">
+        ✅ Se connecter
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Commande n°{{ order.id }}{% endblock %}
+
+{% block body %}
+<h1>🧾 Récapitulatif de la commande</h1>
+
+<ul>
+    {% for item in order.orderItems %}
+        <li>{{ item.quantity }} × {{ item.dish.name }} ({{ item.dish.price }}€)</li>
+    {% endfor %}
+</ul>
+
+<p><strong>Total :</strong> {{ order.total }}€</p>
+<a href="{{ path('home') }}">Retour au menu</a>
+{% endblock %}
