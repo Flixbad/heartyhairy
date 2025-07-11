@@ -188,7 +188,7 @@ public function supprimerArticle(int $id, SessionInterface $session): Response
         return $this->redirectToRoute('panier_affichage');
     }
 
-    #[Route('/paiement', name: 'afficher_paiement')]
+    #[Route('/admin/paiement', name: 'afficher_paiement')]
     public function afficherPaiement(Request $request, SessionInterface $session, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(PaymentType::class);
