@@ -219,20 +219,13 @@ public function afficherPaiement(Request $request, DishRepository $dishRepo): Re
 
     $checkoutSession = \Stripe\Checkout\Session::create([
         'payment_method_types' => ['card'],
-        'line_items' => [[
-          'price_data' => [
-            'currency' => 'eur',
-            'product_data' => ['name' => 'Ton produit'],
-            'unit_amount' => 1000,
-          ],
-          'quantity' => 1,
-        ]],
+        'line_items' => $lineItems,
         'mode' => 'payment',
-        'success_url' => 'https://example.com/success',
-        'cancel_url' => 'https://example.com/cancel',
-      ]);
+        'success_url' => $this->generateUrl('valider_commande', [], UrlGeneratorInterface::ABSOLUTE_URL),
+        'cancel_url' => $this->generateUrl('panier_affichage', [], UrlGeneratorInterface::ABSOLUTE_URL),
+    ]);
 
-    return $this->redirect($checkoutSession);
+      return $this->redirect($checkoutSession->url);
     }
 
     #[Route('/mon-compte', name: 'mon_compte')]
