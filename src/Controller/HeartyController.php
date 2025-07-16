@@ -7,14 +7,20 @@ use App\Entity\Order;
 use App\Entity\OrderItem;
 use App\Entity\Category;
 use App\Form\PaymentType;
+use App\Form\ProfileType;
 use App\Repository\DishRepository;
 use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Stripe\BillingPortal\Session;
+use Stripe\Stripe;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class HeartyController extends AbstractController
 {
@@ -189,25 +195,78 @@ public function supprimerArticle(int $id, SessionInterface $session): Response
     }
 
     #[Route('/admin/paiement', name: 'afficher_paiement')]
-    public function afficherPaiement(Request $request, SessionInterface $session, EntityManagerInterface $em): Response
-    {
-        $form = $this->createForm(PaymentType::class);
-        $form->handleRequest($request);
+public function afficherPaiement(Request $request, DishRepository $dishRepo): Response
+{
+    $session = $request->getSession();
+    Stripe::setApiKey($this->getParameter('stripe.secret_key'));
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $mode = $data['payment'];
-            $session->set('mode_paiement', $mode);
+    $panier = $session->get('panier', []);
+    $lineItems = [];
 
-            return $this->redirectToRoute('valider_commande');
+    foreach ($panier as $dishId => $qty) {
+        $dish = $dishRepo->find($dishId);
+        if ($dish) {
+            $lineItems[] = [
+                'price_data' => [
+                    'currency' => 'eur',
+                    'product_data' => ['name' => $dish->getName()],
+                    'unit_amount' => $dish->getPrice() * 100,
+                ],
+                'quantity' => $qty,
+            ];
+        }
+    }
+
+    $checkoutSession = \Stripe\Checkout\Session::create([
+        'payment_method_types' => ['card'],
+        'line_items' => [[
+          'price_data' => [
+            'currency' => 'eur',
+            'product_data' => ['name' => 'Ton produit'],
+            'unit_amount' => 1000,
+          ],
+          'quantity' => 1,
+        ]],
+        'mode' => 'payment',
+        'success_url' => 'https://example.com/success',
+        'cancel_url' => 'https://example.com/cancel',
+      ]);
+
+    return $this->redirect($checkoutSession);
+    }
+
+    #[Route('/mon-compte', name: 'mon_compte')]
+public function monCompte(Request $request, EntityManagerInterface $em, SluggerInterface $slugger, UserPasswordHasherInterface $hasher): Response
+{
+    $user = $this->getUser();
+    $form = $this->createForm(ProfileType::class, $user);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        $newPassword = $form->get('plainPassword')->getData();
+        $photoFile = $form->get('photo')->getData();
+
+        if ($newPassword) {
+            $hashed = $hasher->hashPassword($user, $newPassword);
+            $user->setPassword($hashed);
         }
 
-        $panier = $session->get('panier', []);
-        $quantitePanier = array_sum($panier);
+        if ($photoFile) {
+            $safeFilename = $slugger->slug(pathinfo($photoFile->getClientOriginalName(), PATHINFO_FILENAME));
+            $newFilename = $safeFilename.'-'.uniqid().'.'.$photoFile->guessExtension();
+            $photoFile->move('uploads/photos', $newFilename);
+            $user->Setphoto($newFilename);
+        }
 
-        return $this->render('order/paiement.html.twig', [
-            'form' => $form->createView(),
-            'quantitePanier' => $quantitePanier
-        ]);
+        $em->flush();
+        $this->addFlash('success', '✅ Profil mis à jour !');
+        return $this->redirectToRoute('mon_compte');
     }
+
+    return $this->render('user/mon_compte.html.twig', [
+        'form' => $form->createView(),
+        'photo' => $user->getPhoto()
+    ]);
+}
+
 }
