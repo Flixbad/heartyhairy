@@ -1,41 +1,63 @@
-# 🍔 Hearty & Hairy — Projet de restaurant Symfony
+# 🍷 Hearty & Hairy — Application de restaurant
 
-Bienvenue dans le projet **Hearty & Hairy**, une application web gourmande réalisée avec **Symfony**, **EasyAdmin**, et **TailwindCSS**, destinée à la gestion d’un menu de restaurant moderne et dynamique.
-
----
-
-## ✨ Fonctionnalités principales
-
-- 📋 Affichage des plats par catégorie : Entrées, Plats, Desserts, Boissons
-- 🛒 Ajout de plats au panier avec sélection de la quantité
-- 💳 Page de paiement avec choix du mode : Carte bancaire, PayPal, Sur place
-- 📁 Backoffice EasyAdmin pour gérer les plats et les catégories
-- 🖼️ Page d’accueil stylisée avec galerie, horaires, informations de contact
-- 🎨 Interface responsive et design chaleureux grâce à TailwindCSS
+Bienvenue sur **Hearty & Hairy**, l’application web du restaurant raffiné qui permet à ses clients de commander en ligne, et à ses administrateurs de gérer les comptes, plats, et paiements.
 
 ---
 
-## 🔧 Technologies utilisées
+## 🚀 Fonctionnalités
 
-| Technologie  | Description                       |
-|--------------|-----------------------------------|
-| Symfony 6.x  | Framework PHP principal           |
-| EasyAdmin    | Gestion du backoffice             |
-| Twig         | Moteur de template                |
-| TailwindCSS  | Stylisation rapide et responsive |
-| Doctrine ORM | Base de données relationnelle     |
+- 🧑‍🍳 Menu interactif avec ajout au panier
+- 🛒 Panier dynamique (quantités, suppression, total)
+- 💳 Paiement sécurisé via Stripe Checkout
+- 👤 Espace “Mon compte” : profil, photo, mot de passe
+- 📋 Historique de commandes
+- 🔐 Gestion complète des utilisateurs en admin
+- 🧭 Interface navbar personnalisée avec avatar, email et accès admin
+- 🎨 Design doux avec Tailwind CSS et interactions fluides
 
 ---
 
-## 🚀 Lancement du projet en local
+## 🛠️ Technologies utilisées
+
+- Symfony 6.x (PHP 8.x)
+- Twig
+- Doctrine ORM
+- Stripe API
+- Tailwind CSS
+
+---
+
+## 🔑 Accès admin
+
+Les utilisateurs avec le rôle `ROLE_ADMIN` peuvent accéder à :
+
+- `/admin/utilisateurs` : liste, édition et suppression des comptes utilisateurs
+- Lien vers le panel admin visible uniquement dans le menu “Compte” pour les admins
+
+---
+
+## 📦 Structure des templates
+
+templates/ ├── home/ → Page d’accueil ├── hearty/ → Menu du restaurant ├── order/ → Panier + Résumé de commande ├── user/ → Profil client + historique ├── admin/ → Panel d’administration
+
+
+---
+
+## 📂 Lancer le projet en local
 
 ```bash
-git clone https://github.com/votre-utilisateur/hearty-hairy.git
-cd hearty-hairy
 composer install
-npm install
-npm run dev
-php bin/console doctrine:database:create
-php bin/console make:migration
-php bin/console doctrine:migrations:migrate
 symfony server:start
+
+
+Configurer .env.local avec ta clé Stripe :
+STRIPE_SECRET_KEY=sk_test_...
+
+
+🎯 À venir
+Recommander un plat déjà commandé
+Statistiques de commandes dans le panel admin
+Notification par email à la validation de commande
+
+
+Hearty & Hairy™ — Bon appétit dans le code 👨‍🍳🍷
