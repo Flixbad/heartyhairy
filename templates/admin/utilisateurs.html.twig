@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des utilisateurs{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-[#F6F2E5] px-4 py-10">
+  <div class="max-w-5xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-yellow-500">
+
+    <h1 class="text-3xl font-extrabold text-yellow-700 mb-6 text-center drop-shadow">👥 Administration des utilisateurs</h1>
+
+    {% for msg in app.flashes('success') %}
+      <div class="bg-green-100 text-green-700 px-4 py-2 rounded mb-6 text-center font-semibold">
+        {{ msg }}
+      </div>
+    {% endfor %}
+
+    <table class="w-full border border-gray-200 rounded shadow text-sm">
+      <thead class="bg-yellow-100 text-gray-800 text-left">
+        <tr>
+          <th class="px-4 py-3">ID</th>
+          <th class="px-4 py-3">Email</th>
+          <th class="px-4 py-3">Téléphone</th>
+          <th class="px-4 py-3">Rôles</th>
+          <th class="px-4 py-3 text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% for user in users %}
+          <tr class="hover:bg-yellow-50 transition">
+            <td class="px-4 py-3">{{ user.id }}</td>
+            <td class="px-4 py-3">{{ user.email }}</td>
+            <td class="px-4 py-3">{{ user.phone ?? '—' }}</td>
+            <td class="px-4 py-3">{{ user.roles|join(', ') }}</td>
+            <td class="px-4 py-3 text-center space-x-2">
+              <a href="{{ path('admin_modifier_utilisateur', { id: user.id }) }}"
+                 class="text-yellow-600 hover:underline">✏️ Modifier</a>
+              <a href="{{ path('admin_supprimer_utilisateur', { id: user.id }) }}"
+                 class="text-red-600 hover:underline">🗑️ Supprimer</a>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="5" class="text-center py-6 text-gray-500 italic">Aucun utilisateur enregistré pour le moment.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  </div>
+</div>
+{% endblock %}

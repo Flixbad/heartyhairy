@@ -25,11 +25,15 @@ class Order
     #[ORM\Column]
     private ?float $totalprice = null;
 
+    #[ORM\OneToMany(mappedBy: 'order', targetEntity: OrderItem::class, cascade: ['persist'], orphanRemoval: true)]
+    private Collection $orderItems;
+    
+
+
     /**
      * @var Collection<int, OrderItem>
      */
-    #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'orderObject')]
-    private Collection $orderItems;
+    
 
     public function __construct()
     {
@@ -106,4 +110,5 @@ class Order
 
         return $this;
     }
+    
 }

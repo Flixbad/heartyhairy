@@ -6,10 +6,12 @@ use App\Entity\Dish;
 use App\Entity\Order;
 use App\Entity\OrderItem;
 use App\Entity\Category;
+use App\Entity\User;
 use App\Form\PaymentType;
 use App\Form\ProfileType;
 use App\Repository\DishRepository;
 use App\Repository\CategoryRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Stripe\BillingPortal\Session;
 use Stripe\Stripe;
@@ -85,18 +87,45 @@ class HeartyController extends AbstractController
         ]);
     }
 
-    #[Route('/conf', name: 'admin')]
-    public function adminPanel(CategoryRepository $catRepo, DishRepository $dishRepo, SessionInterface $session): Response
-    {
-        $panier = $session->get('panier', []);
-        $quantitePanier = array_sum($panier);
+    #[Route('/admin/utilisateurs', name: 'admin_utilisateurs')]
+public function afficherUtilisateurs(UserRepository $userRepo): Response
+{
+    $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        return $this->render('admin/index.html.twig', [
-            'categories' => $catRepo->findAll(),
-            'dishes' => $dishRepo->findAll(),
-            'quantitePanier' => $quantitePanier
-        ]);
+    $users = $userRepo->findAll();
+
+    return $this->render('admin/utilisateurs.html.twig', [
+        'users' => $users
+    ]);
+}
+
+#[Route('/admin/utilisateur/{id}/modifier', name: 'admin_modifier_utilisateur')]
+public function modifierUtilisateur(User $user, Request $request, EntityManagerInterface $em): Response
+{
+    $form = $this->createForm(ProfileType::class, $user);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        $em->flush();
+        $this->addFlash('success', '✅ Utilisateur modifié avec succès !');
+        return $this->redirectToRoute('admin_utilisateurs');
     }
+
+    return $this->render('admin/modifier_utilisateur.html.twig', [
+        'form' => $form->createView(),
+        'user' => $user
+    ]);
+}
+
+#[Route('/admin/utilisateur/{id}/supprimer', name: 'admin_supprimer_utilisateur', methods: ['POST', 'GET'])]
+public function supprimerUtilisateur(User $user, EntityManagerInterface $em): Response
+{
+    $em->remove($user);
+    $em->flush();
+
+    $this->addFlash('success', '🗑️ Utilisateur supprimé avec succès.');
+    return $this->redirectToRoute('admin_utilisateurs');
+}
 
     #[Route('/panier/ajout', name: 'panier_ajout', methods: ['POST'])]
     public function addToCart(Request $request, SessionInterface $session): Response
@@ -160,32 +189,43 @@ public function supprimerArticle(int $id, SessionInterface $session): Response
     return $this->redirectToRoute('panier_affichage');
 }
 
-    #[Route('/panier/valider', name: 'valider_commande', methods: ['POST'])]
-    public function validerCommande(SessionInterface $session, EntityManagerInterface $em, DishRepository $dishRepo): Response
-    {
-        $panier = $session->get('panier', []);
-        $order = new Order();
-        $total = 0;
+#[Route('/panier/valider', name: 'valider_commande', methods: ['GET', 'POST'])]
+public function validerCommande(SessionInterface $session, EntityManagerInterface $em, DishRepository $dishRepo): Response
+{
+    $panier = $session->get('panier', []);
+    $order = new Order();
+    $total = 0;
 
-        foreach ($panier as $dishId => $qty) {
-            $dish = $dishRepo->find($dishId);
-            if ($dish) {
-                $item = new OrderItem();
-                $item->setDish($dish);
-                $item->setQuantity($qty);
-                $order->addOrderItem($item);
-                $total += $dish->getPrice() * $qty;
-            }
+    foreach ($panier as $dishId => $qty) {
+        $dish = $dishRepo->find($dishId);
+        if ($dish) {
+            $item = new OrderItem();
+            $item->setDish($dish);
+            $item->setQuantity($qty);
+            $order->addOrderItem($item);
+            $total += $dish->getPrice() * $qty;
         }
-
-        $order->setTotalprice($total);
-        $em->persist($order);
-        $em->flush();
-
-        $session->remove('panier');
-
-        return $this->redirectToRoute('order_summary', ['id' => $order->getId()]);
     }
+
+    // 🔐 Associer l'utilisateur
+    
+
+    // 🕒 Ajouter la date
+    $order->setCreatedAt(new \DateTimeImmutable());
+
+    // 💰 Total final
+    $order->setTotalprice($total);
+
+    // 🧾 Persister la commande (+ OrderItems grâce au cascade)
+    $em->persist($order);
+    $em->flush();
+
+    // 🧹 Vider le panier
+    $session->remove('panier');
+
+    return $this->redirectToRoute('order_summary', ['id' => $order->getId()]);
+}
+
 
     #[Route('/panier/vider', name: 'vider_panier')]
     public function viderPanier(SessionInterface $session): Response

@@ -22,6 +22,12 @@ class OrderItem
     #[ORM\ManyToOne(inversedBy: 'orderItems')]
     private ?Order $orderObject = null;
 
+    #[ORM\ManyToOne(inversedBy: 'orders')]
+private ?User $user = null;
+
+#[ORM\Column(type: 'datetime')]
+private ?\DateTimeInterface $createdAt = null;
+
     public function getId(): ?int
     {
         return $this->id;

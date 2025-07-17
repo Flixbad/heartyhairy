@@ -1,16 +1,24 @@
-
-
-<footer class="bg-white rounded-lg shadow-sm m-4 dark:bg-gray-800">
-    <div class="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
-      <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2025 <a href="#" class="hover:underline">Hearty & Hairy™</a>. All Rights Reserved.
+<footer class="bg-[#F6F2E5] border-t border-yellow-500 shadow-inner mt-10">
+  <div class="max-w-screen-xl mx-auto px-4 py-6 md:flex md:items-center md:justify-between">
+    
+    <span class="text-sm text-gray-700 sm:text-center block mb-4 md:mb-0">
+      © 2025 <a href="#" class="hover:text-yellow-600 font-semibold">Hearty & Hairy™</a> — Tous droits réservés.
     </span>
-    <ul class="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
-        <li>
-            <a href="{{ path('home') }}" class="hover:underline me-4 md:me-6">Carte</a>
-        </li>
-        <li>
-            <a href="{{ path('panier_affichage') }}" class="hover:underline me-4 md:me-6">Panier</a>
-        </li>
+
+    <ul class="flex flex-wrap items-center text-sm font-medium text-gray-700 space-x-4">
+      <li>
+        <a href="{{ path('home') }}" class="hover:text-yellow-600 transition">Accueil</a>
+      </li>
+      <li>
+        <a href="{{ path('menu') }}" class="hover:text-yellow-600 transition">Carte</a>
+      </li>
+      <li>
+        <a href="{{ path('panier_affichage') }}" class="hover:text-yellow-600 transition">Panier</a>
+      </li>
+      <li>
+        <a href="#" class="hover:text-yellow-600 transition">À propos</a>
+      </li>
     </ul>
-    </div>
+    
+  </div>
 </footer>
