@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Dish;
+use App\Entity\NewsletterSubscriber;
 use App\Entity\Order;
 use App\Entity\OrderItem;
 use App\Entity\Category;
@@ -23,6 +24,9 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+
 
 class HeartyController extends AbstractController
 {
@@ -127,6 +131,13 @@ public function supprimerUtilisateur(User $user, EntityManagerInterface $em): Re
     return $this->redirectToRoute('admin_utilisateurs');
 }
 
+#[Route('/a-propos', name: 'a_propos')]
+public function apropos(): Response
+{
+    return $this->render('apropos.html.twig');
+}
+
+
     #[Route('/panier/ajout', name: 'panier_ajout', methods: ['POST'])]
     public function addToCart(Request $request, SessionInterface $session): Response
     {
@@ -212,6 +223,7 @@ public function validerCommande(SessionInterface $session, EntityManagerInterfac
 
     // 🕒 Ajouter la date
     $order->setCreatedAt(new \DateTimeImmutable());
+    $order->setStatus('En Cours');
 
     // 💰 Total final
     $order->setTotalprice($total);
@@ -301,5 +313,42 @@ public function monCompte(Request $request, EntityManagerInterface $em, SluggerI
         'photo' => $user->getPhoto()
     ]);
 }
+
+#[Route('/newsletter', name: 'newsletter_inscription', methods: ['POST'])]
+public function newsletter(Request $request, EntityManagerInterface $em, MailerInterface $mailer): Response
+{
+    $email = $request->request->get('email');
+
+    $existing = $em->getRepository(NewsletterSubscriber::class)->findOneBy(['email' => $email]);
+    if ($existing) {
+        $this->addFlash('success', '✅ Vous êtes déjà inscrit à notre newsletter !');
+        return $this->redirectToRoute('home');
+    }
+
+    $subscriber = new NewsletterSubscriber();
+    $subscriber->setEmail($email);
+    $subscriber->setSubscribedAt(new \DateTimeImmutable());
+
+    $em->persist($subscriber);
+    $em->flush();
+
+    
+    $message = (new Email())
+        ->from('newsletter@hearty-hairy.local')
+        ->to($email)
+        ->subject('Bienvenue dans notre newsletter !')
+        ->html("
+            <h2 style='color:#D4AF37;'>Merci de vous être abonné 💛</h2>
+            <p>Vous recevrez bientôt nos actualités, plats du moment et offres spéciales.</p>
+            <p><em>Hearty & Hairy — Le goût avec du cœur.</em></p>
+        ");
+
+    $mailer->send($message);
+
+    $this->addFlash('success', '✅ Merci, votre inscription a bien été enregistrée !');
+    return $this->redirectToRoute('home');
+}
+
+
 
 }

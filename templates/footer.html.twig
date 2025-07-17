@@ -1,24 +1,30 @@
 <footer class="bg-[#F6F2E5] border-t border-yellow-500 shadow-inner mt-10">
-  <div class="max-w-screen-xl mx-auto px-4 py-6 md:flex md:items-center md:justify-between">
-    
-    <span class="text-sm text-gray-700 sm:text-center block mb-4 md:mb-0">
-      © 2025 <a href="#" class="hover:text-yellow-600 font-semibold">Hearty & Hairy™</a> — Tous droits réservés.
-    </span>
+  <div class="max-w-screen-xl mx-auto px-4 py-8 md:flex md:items-start md:justify-between">
 
-    <ul class="flex flex-wrap items-center text-sm font-medium text-gray-700 space-x-4">
-      <li>
-        <a href="{{ path('home') }}" class="hover:text-yellow-600 transition">Accueil</a>
-      </li>
-      <li>
-        <a href="{{ path('menu') }}" class="hover:text-yellow-600 transition">Carte</a>
-      </li>
-      <li>
-        <a href="{{ path('panier_affichage') }}" class="hover:text-yellow-600 transition">Panier</a>
-      </li>
-      <li>
-        <a href="#" class="hover:text-yellow-600 transition">À propos</a>
-      </li>
-    </ul>
-    
+    <div class="mb-6 md:mb-0">
+      <span class="text-sm text-gray-700 block mb-2">
+        © 2025 <strong>Hearty & Hairy™</strong> — Tous droits réservés.
+      </span>
+      <ul class="flex flex-wrap items-center text-sm font-medium text-gray-700 space-x-4">
+        <li><a href="{{ path('home') }}" class="hover:text-yellow-600">Accueil</a></li>
+        <li><a href="{{ path('menu') }}" class="hover:text-yellow-600">Carte</a></li>
+        <li><a href="{{ path('panier_affichage') }}" class="hover:text-yellow-600">Panier</a></li>
+        <li><a href="{{ path('a_propos') }}" class="hover:text-yellow-600">À propos</a></li>
+      </ul>
+    </div>
+
+    <div class="w-full max-w-md">
+      <h3 class="text-yellow-700 text-lg font-bold mb-2">Abonnez-vous à notre newsletter</h3>
+      <form action="{{ path('newsletter_inscription') }}" method="POST" class="flex flex-col sm:flex-row gap-3">
+        <input type="email" name="email" required
+               placeholder="Votre email"
+               class="flex-1 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white text-gray-900 shadow-sm" />
+        <button type="submit"
+                class="px-6 py-2 bg-yellow-500 text-black font-semibold rounded-md hover:bg-yellow-400 transition shadow">
+          S'inscrire
+        </button>
+      </form>
+    </div>
+
   </div>
 </footer>
