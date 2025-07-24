@@ -13,6 +13,7 @@ use App\Form\ProfileType;
 use App\Repository\DishRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\UserRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Stripe\BillingPortal\Session;
 use Stripe\Stripe;
@@ -222,7 +223,7 @@ public function validerCommande(SessionInterface $session, EntityManagerInterfac
     
 
     // 🕒 Ajouter la date
-    $order->setCreatedAt(new \DateTimeImmutable());
+    $order->setCreatedAt(new DateTimeImmutable());
     $order->setStatus('En Cours');
 
     // 💰 Total final
@@ -283,36 +284,50 @@ public function afficherPaiement(Request $request, DishRepository $dishRepo): Re
     #[Route('/mon-compte', name: 'mon_compte')]
 public function monCompte(Request $request, EntityManagerInterface $em, SluggerInterface $slugger, UserPasswordHasherInterface $hasher): Response
 {
+    // Récupère l'utilisateur connecté
     $user = $this->getUser();
+
+    // Crée le formulaire de profil
     $form = $this->createForm(ProfileType::class, $user);
     $form->handleRequest($request);
 
+    // Si le formulaire est soumis et valide
     if ($form->isSubmitted() && $form->isValid()) {
+        // Récupère le nouveau mot de passe
         $newPassword = $form->get('plainPassword')->getData();
+
+        // Récupère la nouvelle photo (si envoyée)
         $photoFile = $form->get('photo')->getData();
 
+        // Mise à jour du mot de passe si fourni
         if ($newPassword) {
             $hashed = $hasher->hashPassword($user, $newPassword);
             $user->setPassword($hashed);
         }
 
+        // Mise à jour de la photo de profil si fournie
         if ($photoFile) {
             $safeFilename = $slugger->slug(pathinfo($photoFile->getClientOriginalName(), PATHINFO_FILENAME));
-            $newFilename = $safeFilename.'-'.uniqid().'.'.$photoFile->guessExtension();
+            $newFilename = $safeFilename . '-' . uniqid() . '.' . $photoFile->guessExtension();
             $photoFile->move('uploads/photos', $newFilename);
-            $user->Setphoto($newFilename);
+            $user->setPhoto($newFilename);
         }
 
+        // Persiste les modifications
         $em->flush();
+
+        // Message flash + redirection
         $this->addFlash('success', '✅ Profil mis à jour !');
         return $this->redirectToRoute('mon_compte');
     }
 
+    // Affiche le formulaire
     return $this->render('user/mon_compte.html.twig', [
         'form' => $form->createView(),
         'photo' => $user->getPhoto()
     ]);
 }
+
 
 #[Route('/newsletter', name: 'newsletter_inscription', methods: ['POST'])]
 public function newsletter(Request $request, EntityManagerInterface $em, MailerInterface $mailer): Response

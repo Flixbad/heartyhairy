@@ -1,6 +1,14 @@
 {% extends 'base.html.twig' %}
 
+
 {% block body %}
+
+<script>
+  setTimeout(() => {
+    document.getElementById('promoPopup').classList.remove('hidden');
+  }, 2500); 
+</script>
+
 <!-- Hero section -->
 <section class="relative w-full h-[70vh] bg-center bg-cover flex items-center justify-center"
          style="background-image: url('/image/hero-restaurant.jpg');">
@@ -16,6 +24,20 @@
       Découvrir la carte
     </a>
   </div>
+
+  <div id="promoPopup"
+     class="fixed top-10 left-1/2 transform -translate-x-1/2 z-50 bg-yellow-100 border border-yellow-500 rounded-lg shadow-lg p-6 max-w-sm text-center hidden">
+  <h2 class="text-lg font-bold text-yellow-800 mb-2">🎉 Offre du jour</h2>
+  <p class="text-gray-700 mb-4">-10% sur toutes les entrées jusqu'à ce soir !</p>
+  <a href="{{ path('menu') }}"
+     class="inline-block bg-yellow-500 text-black font-semibold px-4 py-2 rounded hover:bg-yellow-400 transition">
+    Je profite 🍽️
+  </a>
+  <button onclick="document.getElementById('promoPopup').classList.add('hidden')"
+          class="absolute top-2 right-2 text-yellow-800 text-xl font-bold hover:text-yellow-600">
+    &times;
+  </button>
+</div>
 </section>
 
 
