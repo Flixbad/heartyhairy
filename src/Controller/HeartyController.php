@@ -219,21 +219,21 @@ public function validerCommande(SessionInterface $session, EntityManagerInterfac
         }
     }
 
-    // 🔐 Associer l'utilisateur
+    // Associer l'utilisateur
     
 
-    // 🕒 Ajouter la date
+    //  Ajouter la date
     $order->setCreatedAt(new DateTimeImmutable());
     $order->setStatus('En Cours');
 
-    // 💰 Total final
+    //  Total final
     $order->setTotalprice($total);
 
-    // 🧾 Persister la commande (+ OrderItems grâce au cascade)
+    // Persister la commande (+ OrderItems grâce au cascade)
     $em->persist($order);
     $em->flush();
 
-    // 🧹 Vider le panier
+    //  Vider le panier
     $session->remove('panier');
 
     return $this->redirectToRoute('order_summary', ['id' => $order->getId()]);
